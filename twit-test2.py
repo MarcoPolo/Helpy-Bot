@@ -9,9 +9,7 @@ import plugins
 class Listener ( StreamListener):
     def on_status( self, status ):
         try:
-            print '-' * 20
-            print status.user.screen_name, status.text
-            #plugins.insult(status.text)
+			print '{0} -- {1}'.format(status.author.name, status.text)
         except:
             print 'sorry error'
         return
@@ -66,11 +64,4 @@ if __name__ == '__main__':
         main()
     except KeyboardInterrupt:
         print '\nGoodbye!'
-
-#api.update_status(sys.argv[1])
-#me = api.user_timeline('dr_choc')
-#print dir(me[0])
-#print [x.text for x in me]
-
-
 
