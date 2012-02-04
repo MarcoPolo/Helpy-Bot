@@ -77,6 +77,8 @@ class HelpyBot(StreamListener):
     def isup(self, tweet):
         text = tweet['text']
         url = text[0]
+        if (url.find('http://') == -1 and url.find('https://') == -1 ):
+            url = 'http://'+url
         user = 'dr_choc'
         #user = tweet['user']
         up = False
