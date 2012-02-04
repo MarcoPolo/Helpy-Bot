@@ -6,7 +6,7 @@ from secretStuff import *
 class Listener ( StreamListener ):
     def on_status( self, status ):
         try:
-            print status.author.name, status.text, status.place['full_name']
+			print '{0} -- {1}'.format(status.author.name, status.text)
         except:
             pass
         return
@@ -39,33 +39,19 @@ def main():
 	box.
 
 	"""
-	auth1 = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
-	auth1.set_access_token(ACCESS_KEY, ACCESS_SECRET)
-	api = tweepy.API(auth1)
+	auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+	auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
+	api = tweepy.API(auth)
 
 	listener = Listener()
-	stream = Stream(auth=auth1, listener=listener, timeout=None,)
+	#stream = Stream(auth=auth, listener=listener, timeout=None,)
+	
+	api.user_timeline()
 
-	print dir(stream)
-	stream.userstream('dr_choc')
-	#stream.filter(locations=[
-	#-87.528076,29.363027,-81.210937,30.836215,
-	#-82.825928,24.417142,-79.94751,29.363027,
-	#])
-
-# filter messages with the text 'apple'
-#stream.filter(None,['apple'])
 
 if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
         print '\nGoodbye!'
-
-#api.update_status(sys.argv[1])
-#me = api.user_timeline('dr_choc')
-#print dir(me[0])
-#print [x.text for x in me]
-
-
 
