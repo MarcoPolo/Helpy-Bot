@@ -3,11 +3,12 @@ import random
 import urllib
 import tweepy
 import subprocess
+import json
 from tweepy.streaming import StreamListener, Stream
 
 class HelpyBot(StreamListener):
     def __init__(self, api):
-        self.commands = ['insult', 'compliment', 'isup', 'reminder','download']
+        self.commands = ['insult', 'compliment', 'isup', 'reminder','download','music']
         self.api = api
         super(HelpyBot, self).__init__()
 
@@ -116,13 +117,25 @@ class HelpyBot(StreamListener):
         response = '@%s, seems to be %s from here!' % (user, 'up' if up else 'down')
         self.post_tweet(response)
 
+    def music(self, tweet):
+        music = urllib.urlopen('http://hypem.com/playlist/latest/fresh/json/1/data.js')
+        music = music.read()
+        music = json.loads(music)
+        song = music[str(random.randint(0,len(music)))]
+        url = urllib.quote(song["title"])
+        response = 'http://grooveshark.com/#!/search?q='+url
+        self.post_tweet(response)
+        
+        
+
+
     def reminder(self, tweet):
         text = tweet['text']
         user = 'dr_choc'
         #user = tweet['sender']
         time = text[1].split(':')
         reminder = text[3:]
-        reminder = ''.join(reminder)
+        reminder = ' '.join(reminder)
         reminder = reminder.replace(';','')
         reminder = reminder.replace("'",'')
 
@@ -138,7 +151,7 @@ class HelpyBot(StreamListener):
 
         response = '@%s, I set a reminder for %s.' % (user, time_text)
         self.post_tweet(response)
-        subprocess.call('sleep '+str(seconds)+"; python post.py '"+ reminder+"'", shell=True)
+        procs = subprocess.Popen('sleep '+str(seconds)+"; python post.py '"+ reminder+"'", shell=True)
  
 
 if __name__ == '__main__':
@@ -156,7 +169,9 @@ if __name__ == '__main__':
     helpy.on_status('@Helpy_bot isup google.com')
     helpy.on_status('@Helpy_bot isup http://www.google.com')
     #helpy.on_status('@Helpy_bot download http://www.google.com lol.txt')
-    helpy.on_status('@Helpy_bot reminder in 0:01 to blah blah blah poop')
+    #helpy.on_status('@Helpy_bot reminder in 0:01 to remind me to do stuff')
+    helpy.on_status('@Helpy_bot isup http://www.google.com')
+    helpy.on_status('@Helpy_bot music')
 
     #listener = HelpyBot()
     #stream = Stream(auth, listener)
