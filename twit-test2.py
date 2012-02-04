@@ -47,11 +47,11 @@ def main():
 	stream = Stream(auth=auth1, listener=listener, timeout=None,)
 
 	print dir(stream)
-	stream.userstream('dr_choc')
-	#stream.filter(locations=[
-	#-87.528076,29.363027,-81.210937,30.836215,
-	#-82.825928,24.417142,-79.94751,29.363027,
-	#])
+	#stream.userstream('dr_choc')
+	stream.filter(locations=[
+	-87.528076,29.363027,-81.210937,30.836215,
+	-82.825928,24.417142,-79.94751,29.363027,
+	])
 
 # filter messages with the text 'apple'
 #stream.filter(None,['apple'])
