@@ -20,7 +20,15 @@ class Listener ( StreamListener ):
         return True
     def on_timeout(self):
         return True
+
+
+class Listener (StreamListener):
+    def on_status(self, status):
+        print '-' * 20
+        print status.user.screen_name, status.text
+        return
  
+
 def main():
 	"""
 	Go to:
@@ -42,16 +50,16 @@ def main():
 	auth1 = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 	auth1.set_access_token(ACCESS_KEY, ACCESS_SECRET)
 	api = tweepy.API(auth1)
+        global dc
+        dc=api.get_user('helpy_bot')
 
 	listener = Listener()
-	stream = Stream(auth=auth1, listener=listener, timeout=None,)
+	stream = Stream(auth1, listener)
 
 	print dir(stream)
 	#stream.userstream('dr_choc')
-	stream.filter(locations=[
-	-87.528076,29.363027,-81.210937,30.836215,
-	-82.825928,24.417142,-79.94751,29.363027,
-	])
+    #this has to be a user id
+	stream.filter(follow=(483102366,),)
 
 # filter messages with the text 'apple'
 #stream.filter(None,['apple'])
