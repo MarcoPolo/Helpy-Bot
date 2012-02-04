@@ -6,7 +6,7 @@ from tweepy.streaming import StreamListener, Stream
 
 class HelpyBot(StreamListener):
     def __init__(self, api):
-        self.commands = ['insult', 'compliment', 'isup']
+        self.commands = ['insult', 'compliment', 'isup','download']
         self.api = api
         super(HelpyBot, self).__init__()
 
@@ -73,6 +73,28 @@ class HelpyBot(StreamListener):
 
     def define(self, tweet):
         pass
+    
+    def download(self, tweet):
+        text = tweet['text']
+        url = text[0]
+        if (url.find('http://') == -1 and url.find('https://') == -1 ):
+            url = 'http://'+url
+        try:
+            name = text[1]
+        except:
+            name = "potato"
+        if (name.find('.') == -1):
+            fileExt = url.split('/')[-1]
+            fileExt = fileExt[:fileExt.find('.')]
+        else:
+            fileExt = ''
+
+#feeble attempt to protect against shelli
+        if(fileExt == '.torrent'):
+            fileExt = fileExt.strip(';')
+            subprocess.call('deluge-console add '+url)
+        else:
+            urllib.urlretrieve (url, name+fileExt)
         
     def isup(self, tweet):
         text = tweet['text']
@@ -111,6 +133,7 @@ if __name__ == '__main__':
     helpy.on_status('@Helpy_bot compliment @ronald if you would be so kind.')
     helpy.on_status('@Helpy_bot isup google.com')
     helpy.on_status('@Helpy_bot isup http://www.google.com')
+    helpy.on_status('@Helpy_bot download http://www.google.com lol.txt')
 
     #listener = HelpyBot()
     #stream = Stream(auth, listener)
