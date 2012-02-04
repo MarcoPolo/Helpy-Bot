@@ -1,6 +1,7 @@
 import sys
 import random
 import urllib
+import reddit
 import tweepy
 import subprocess
 import json
@@ -8,7 +9,7 @@ from tweepy.streaming import StreamListener, Stream
 
 class HelpyBot(StreamListener):
     def __init__(self, api):
-        self.commands = ['insult', 'compliment', 'isup', 'reminder','download','music']
+        self.commands = ['insult', 'compliment', 'isup', 'reminder','download','music', 'funnypic']
         self.api = api
         super(HelpyBot, self).__init__()
 
@@ -40,7 +41,7 @@ class HelpyBot(StreamListener):
         tokens = text.lower().split()
         parsed = {}
         parsed['target'] = tokens[0]
-        parsed['command'] = tokens[1]
+        parsed['command'] = tokens[1].strip('.,!?')
         parsed['text'] = tokens[2:]
         parsed['raw_text'] = ' '.join(tokens[2:])
         #parsed['sender'] = status.user.screen_name
@@ -91,7 +92,7 @@ class HelpyBot(StreamListener):
         else:
             fileExt = ''
 
-#feeble attempt to protect against shelli
+		# feeble attempt to protect against shell injection
         if(fileExt == '.torrent'):
             fileExt = fileExt.replace(';','')
             fileExt = fileExt.replace("'",'')
@@ -150,8 +151,25 @@ class HelpyBot(StreamListener):
         time_text = later.strftime('%I:%M %p')
 
         response = '@%s, I set a reminder for %s.' % (user, time_text)
-        self.post_tweet(response)
         procs = subprocess.Popen('sleep '+str(seconds)+"; python post.py '"+ reminder+"'", shell=True)
+        self.post_tweet(response)
+
+    def funnypic(self, tweet):
+        text = tweet['text']
+        user = 'dr_choc'
+        #user = tweet['sender']
+
+        r = reddit.Reddit(user_agent='helpy_bot')
+        submissions = r.get_subreddit('funny').get_hot(limit=25)
+        image_link = ''
+        while (True):
+            submission = submissions.next()
+            if ('imgur.com' in submission.url):
+                image_link = submission.url
+                break
+
+        response = '@%s, enjoy: %s' % (user, image_link)
+        self.post_tweet(response)
  
 
 if __name__ == '__main__':
@@ -169,9 +187,10 @@ if __name__ == '__main__':
     helpy.on_status('@Helpy_bot isup google.com')
     helpy.on_status('@Helpy_bot isup http://www.google.com')
     #helpy.on_status('@Helpy_bot download http://www.google.com lol.txt')
-    #helpy.on_status('@Helpy_bot reminder in 0:01 to remind me to do stuff')
     helpy.on_status('@Helpy_bot isup http://www.google.com')
     helpy.on_status('@Helpy_bot music')
+    #helpy.on_status('@Helpy_bot reminder in 0:01 to blah blah blah poop')
+    helpy.on_status('@Helpy_bot funnypic, please')
 
     #listener = HelpyBot()
     #stream = Stream(auth, listener)
