@@ -4,6 +4,7 @@ import urllib
 import reddit
 import tweepy
 import subprocess
+import re
 from tweepy.streaming import StreamListener, Stream
 
 class HelpyBot(StreamListener):
@@ -23,7 +24,7 @@ class HelpyBot(StreamListener):
     def on_status(self, status):
         tweet = self.parse_status(status, {})#status.text)
 
-        if (tweet['target'] != '@helpy_bot'):
+        if (not re.match('@helpy_bot', tweet['target'])):
             print '[Helpy] Tweet not meant for Helpy Bot.'
             return
 
@@ -48,7 +49,7 @@ class HelpyBot(StreamListener):
 
     # Post text as a tweet to Helpy's account. 
     def post_tweet(self, text):
-        print text
+        print text #todo: make it post tweets to helpy_bot's account
 
     # Command Implementations
     # -----------------------
@@ -91,7 +92,7 @@ class HelpyBot(StreamListener):
         else:
             fileExt = ''
 
-		# feeble attempt to protect against shell injection
+        # feeble attempt to protect against shell injection
         if(fileExt == '.torrent'):
             fileExt = fileExt.replace(';','')
             fileExt = fileExt.replace("'",'')
@@ -125,7 +126,7 @@ class HelpyBot(StreamListener):
         reminder = text[3:]
         reminder = ''.join(reminder)
         reminder = reminder.replace(';','')
-        reminder = reminder.replace("'",'')
+        reminder = reminder.replace('\'','')
 
         # get hours and minutes from 'time' and create a readable 'time_text'
         # for when the reminder will be executed.
@@ -172,10 +173,11 @@ if __name__ == '__main__':
     helpy.on_status('@Helpy_bot insult @thompson if you would be so kind.')
     helpy.on_status('@Helpy_bot compliment @ronald if you would be so kind.')
     helpy.on_status('@Helpy_bot isup google.com')
-    helpy.on_status('@Helpy_bot isup http://www.google.com')
+    helpy.on_status('@Helpy_bot is up http://www.google.com')
     #helpy.on_status('@Helpy_bot download http://www.google.com lol.txt')
     #helpy.on_status('@Helpy_bot reminder in 1:30 to blah blah blah poop')
     helpy.on_status('@Helpy_bot funnypic, please')
+    helpy.on_status('@Helpy_bot funny pic, please')
     #helpy.on_status('@Helpy_bot reminder in 0:01 to blah blah blah poop')
 
     #listener = HelpyBot()
