@@ -1,2 +1,3 @@
-*.swp
+secretStuff.py
+*.sw*
 *.pyc
