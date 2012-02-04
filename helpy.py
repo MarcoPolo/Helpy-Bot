@@ -1,12 +1,12 @@
 import sys
 import random
-import tweepy
 import urllib
+import tweepy
 from tweepy.streaming import StreamListener, Stream
 
 class HelpyBot(StreamListener):
     def __init__(self, api):
-        self.commands = ['insult', 'compliment', 'isup','download']
+        self.commands = ['insult', 'compliment', 'isup', 'reminder','download']
         self.api = api
         super(HelpyBot, self).__init__()
 
@@ -41,7 +41,7 @@ class HelpyBot(StreamListener):
         parsed['command'] = tokens[1]
         parsed['text'] = tokens[2:]
         parsed['raw_text'] = ' '.join(tokens[2:])
-        #parsed['user'] = status.user.screen_name
+        #parsed['sender'] = status.user.screen_name
         return parsed
 
     # Post text as a tweet to Helpy's account. 
@@ -102,22 +102,38 @@ class HelpyBot(StreamListener):
         if (url.find('http://') == -1 and url.find('https://') == -1 ):
             url = 'http://'+url
         user = 'dr_choc'
-        #user = tweet['user']
+        #user = tweet['sender']
         up = False
 
         try:
             returnCode = urllib.urlopen(url).getcode()
             if returnCode == 200:
                 up = True
-        except:
-            pass
+        except: pass
 
-        if up:
-            response = '@%s, seems to be up from here!' % user
-        else:
-            response = '@%s, seems to be down from here!' % user
-
+        response = '@%s, seems to be %s from here!' % (user, 'up' if up else 'down')
         self.post_tweet(response)
+
+    def reminder(self, tweet):
+        text = tweet['text']
+        user = 'dr_choc'
+        #user = tweet['sender']
+        time = text[1].split(':')
+        reminder = text[3:]
+
+        # get hours and minutes from 'time' and create a readable 'time_text'
+        # for when the reminder will be executed.
+        import datetime
+        hours = int(time[0])
+        minutes = int(time[1])
+        seconds = (hours * 60 * 60) + (minutes * 60)
+        now = datetime.datetime.now()
+        later = now + datetime.timedelta(0, seconds)
+        time_text = later.strftime('%I:%M %p')
+
+        response = '@%s, I set a reminder for %s.' % (user, time_text)
+        self.post_tweet(response)
+ 
 
 if __name__ == '__main__':
 
@@ -133,7 +149,8 @@ if __name__ == '__main__':
     helpy.on_status('@Helpy_bot compliment @ronald if you would be so kind.')
     helpy.on_status('@Helpy_bot isup google.com')
     helpy.on_status('@Helpy_bot isup http://www.google.com')
-    helpy.on_status('@Helpy_bot download http://www.google.com lol.txt')
+    #helpy.on_status('@Helpy_bot download http://www.google.com lol.txt')
+    helpy.on_status('@Helpy_bot reminder in 1:30 to blah blah blah poop')
 
     #listener = HelpyBot()
     #stream = Stream(auth, listener)
