@@ -4,10 +4,14 @@ import urllib
 import tweepy
 import subprocess
 from tweepy.streaming import StreamListener, Stream
+from wordnik import Wordnik
+import json
+
+w = Wordnik(api_key="58472987eaefce26a73060d591106e49a79b3f586c0d3150a")
 
 class HelpyBot(StreamListener):
     def __init__(self, api):
-        self.commands = ['insult', 'compliment', 'isup', 'reminder','download']
+        self.commands = ['insult', 'compliment', 'isup', 'reminder','download', 'lookup', 'kittenMe']
         self.api = api
         super(HelpyBot, self).__init__()
 
@@ -55,21 +59,21 @@ class HelpyBot(StreamListener):
     def insult(self, tweet):
         insults = open('insults.txt').read().split('\n')
         text = tweet['text']
-        user = text[0]
+        target = text[0]
         response = ''
 
         while (response == '' or len(response) > 140):
-            response = '%s %s' % (user, insults[random.randint(0,96)])
+            response = '%s %s' % (target, insults[random.randint(0,96)])
         self.post_tweet(response)
     
     def compliment(self, tweet):
         compliments = open('compliments.txt').read().split('\n')
         text = tweet['text']
-        user = text[0]
+        target = text[0]
         response = ''
 
         while (response == '' or len(response) > 140):
-            response = '%s %s' % (user, compliments[random.randint(0,45)])
+            response = '%s %s' % (target, compliments[random.randint(0,45)])
         self.post_tweet(response)
 
     def define(self, tweet):
@@ -139,6 +143,32 @@ class HelpyBot(StreamListener):
         response = '@%s, I set a reminder for %s.' % (user, time_text)
         self.post_tweet(response)
         subprocess.call('sleep '+str(seconds)+"; python post.py '"+ reminder+"'", shell=True)
+
+    def lookup(self, tweet):
+        from pprint import pprint
+        word = tweet['text'][0] # get word to lookup
+        url = "http://dictionary.reference.com/browse/"+word
+        output = w.word_get_definitions(word)
+        #pprint(output)
+        if (output == []):
+            self.post_tweet("I'm sorry, the word you requested does not exist.")
+            return
+        a = 0
+        response = output[a]
+        a = 1
+        while (len(response['text']) >= 140):
+            if (a >= len(output)):
+                self.post_tweet("I'm sorry, all definitions are too long.")
+                return
+            response = output[a]
+            a+=1
+        
+        self.post_tweet(response['text'])
+
+
+    def kittenMe(self, tweet):
+        
+
  
 
 if __name__ == '__main__':
@@ -151,12 +181,12 @@ if __name__ == '__main__':
 
     # Setup Helpy to listen to twitter stream.
     helpy = HelpyBot(api)
-    helpy.on_status('@Helpy_bot insult @thompson if you would be so kind.')
-    helpy.on_status('@Helpy_bot compliment @ronald if you would be so kind.')
-    helpy.on_status('@Helpy_bot isup google.com')
-    helpy.on_status('@Helpy_bot isup http://www.google.com')
+    #helpy.on_status('@Helpy_bot insult @thompson if you would be so kind.')
+    #helpy.on_status('@Helpy_bot compliment @ronald if you would be so kind.')
+    #helpy.on_status('@Helpy_bot isup google.com')
+    #helpy.on_status('@Helpy_bot isup http://www.google.com')
     #helpy.on_status('@Helpy_bot download http://www.google.com lol.txt')
-    helpy.on_status('@Helpy_bot reminder in 0:01 to blah blah blah poop')
+    helpy.on_status('@Helpy_bot lookup beef')
 
     #listener = HelpyBot()
     #stream = Stream(auth, listener)
