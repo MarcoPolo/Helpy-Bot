@@ -2,13 +2,18 @@ import sys
 import tweepy
 from tweepy.streaming import StreamListener, Stream
 from secretStuff import *
+import plugins
 
-class Listener ( StreamListener ):
+
+
+class Listener ( StreamListener):
     def on_status( self, status ):
         try:
-            print status.author.name, status.text, status.place['full_name']
+            print '-' * 20
+            print status.user.screen_name, status.text
+            #plugins.insult(status.text)
         except:
-            pass
+            print 'sorry error'
         return
     def on_error(self, status_code):
         if status_code != 406:
@@ -18,16 +23,7 @@ class Listener ( StreamListener ):
                   'not SouthWest longitude, SouthWest latitude, NorthEast ' \
                   'longitude, Northeast Latitude'
         return True
-    def on_timeout(self):
-        return True
 
-
-class Listener (StreamListener):
-    def on_status(self, status):
-        print '-' * 20
-        print status.user.screen_name, status.text
-        return
- 
 
 def main():
 	"""
@@ -49,11 +45,12 @@ def main():
 	"""
 	auth1 = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 	auth1.set_access_token(ACCESS_KEY, ACCESS_SECRET)
+        global api
 	api = tweepy.API(auth1)
         global dc
         dc=api.get_user('helpy_bot')
 
-	listener = Listener()
+	listener = Listener(api)
 	stream = Stream(auth1, listener)
 
 	print dir(stream)
