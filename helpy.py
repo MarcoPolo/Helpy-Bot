@@ -2,6 +2,7 @@ import sys
 import random
 import urllib
 import tweepy
+import subprocess
 from tweepy.streaming import StreamListener, Stream
 
 class HelpyBot(StreamListener):
@@ -91,8 +92,9 @@ class HelpyBot(StreamListener):
 
 #feeble attempt to protect against shelli
         if(fileExt == '.torrent'):
-            fileExt = fileExt.strip(';')
-            subprocess.call('deluge-console add '+url)
+            fileExt = fileExt.replace(';','')
+            fileExt = fileExt.replace("'",'')
+            subprocess.call("deluge-console add '"+url+"'")
         else:
             urllib.urlretrieve (url, name+fileExt)
         
@@ -120,6 +122,9 @@ class HelpyBot(StreamListener):
         #user = tweet['sender']
         time = text[1].split(':')
         reminder = text[3:]
+        reminder = ''.join(reminder)
+        reminder = reminder.replace(';','')
+        reminder = reminder.replace("'",'')
 
         # get hours and minutes from 'time' and create a readable 'time_text'
         # for when the reminder will be executed.
@@ -133,6 +138,7 @@ class HelpyBot(StreamListener):
 
         response = '@%s, I set a reminder for %s.' % (user, time_text)
         self.post_tweet(response)
+        subprocess.call('sleep '+str(seconds)+"; python post.py '"+ reminder+"'", shell=True)
  
 
 if __name__ == '__main__':
@@ -150,7 +156,7 @@ if __name__ == '__main__':
     helpy.on_status('@Helpy_bot isup google.com')
     helpy.on_status('@Helpy_bot isup http://www.google.com')
     #helpy.on_status('@Helpy_bot download http://www.google.com lol.txt')
-    helpy.on_status('@Helpy_bot reminder in 1:30 to blah blah blah poop')
+    helpy.on_status('@Helpy_bot reminder in 0:01 to blah blah blah poop')
 
     #listener = HelpyBot()
     #stream = Stream(auth, listener)
