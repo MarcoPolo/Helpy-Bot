@@ -4,12 +4,16 @@ import urllib
 import reddit
 import tweepy
 import subprocess
-import re
+import json
 from tweepy.streaming import StreamListener, Stream
+from wordnik import Wordnik
+import json
+
+w = Wordnik(api_key="58472987eaefce26a73060d591106e49a79b3f586c0d3150a")
 
 class HelpyBot(StreamListener):
     def __init__(self, api):
-        self.commands = ['insult', 'compliment', 'isup', 'reminder', 'download', 'funnypic']
+        self.commands = ['insult', 'compliment', 'isup', 'reminder','download','music', 'funnypic', 'lookup', 'kittenMe']
         self.api = api
         super(HelpyBot, self).__init__()
 
@@ -57,21 +61,21 @@ class HelpyBot(StreamListener):
     def insult(self, tweet):
         insults = open('insults.txt').read().split('\n')
         text = tweet['text']
-        user = text[0]
+        target = text[0]
         response = ''
 
         while (response == '' or len(response) > 140):
-            response = '%s %s' % (user, insults[random.randint(0,96)])
+            response = '%s %s' % (target, insults[random.randint(0,96)])
         self.post_tweet(response)
     
     def compliment(self, tweet):
         compliments = open('compliments.txt').read().split('\n')
         text = tweet['text']
-        user = text[0]
+        target = text[0]
         response = ''
 
         while (response == '' or len(response) > 140):
-            response = '%s %s' % (user, compliments[random.randint(0,45)])
+            response = '%s %s' % (target, compliments[random.randint(0,45)])
         self.post_tweet(response)
 
     def define(self, tweet):
@@ -118,13 +122,22 @@ class HelpyBot(StreamListener):
         response = '@%s, seems to be %s from here!' % (user, 'up' if up else 'down')
         self.post_tweet(response)
 
+    def music(self, tweet):
+        music = urllib.urlopen('http://hypem.com/playlist/latest/fresh/json/1/data.js')
+        music = music.read()
+        music = json.loads(music)
+        song = music[str(random.randint(0,len(music)))]
+        url = urllib.quote(song["title"])
+        response = 'http://grooveshark.com/#!/search?q='+url
+        self.post_tweet(response)
+
     def reminder(self, tweet):
         text = tweet['text']
         user = 'dr_choc'
         #user = tweet['sender']
         time = text[1].split(':')
         reminder = text[3:]
-        reminder = ''.join(reminder)
+        reminder = ' '.join(reminder)
         reminder = reminder.replace(';','')
         reminder = reminder.replace('\'','')
 
@@ -139,7 +152,7 @@ class HelpyBot(StreamListener):
         time_text = later.strftime('%I:%M %p')
 
         response = '@%s, I set a reminder for %s.' % (user, time_text)
-        subprocess.call('sleep '+str(seconds)+"; python post.py '"+ reminder+"'", shell=True)
+        procs = subprocess.Popen('sleep '+str(seconds)+"; python post.py '"+ reminder+"'", shell=True)
         self.post_tweet(response)
 
     def funnypic(self, tweet):
@@ -158,6 +171,32 @@ class HelpyBot(StreamListener):
 
         response = '@%s, enjoy: %s' % (user, image_link)
         self.post_tweet(response)
+
+    def lookup(self, tweet):
+        from pprint import pprint
+        word = tweet['text'][0] # get word to lookup
+        url = "http://dictionary.reference.com/browse/"+word
+        output = w.word_get_definitions(word)
+        #pprint(output)
+        if (output == []):
+            self.post_tweet("I'm sorry, the word you requested does not exist.")
+            return
+        a = 0
+        response = output[a]
+        a = 1
+        while (len(response['text']) >= 140):
+            if (a >= len(output)):
+                self.post_tweet("I'm sorry, all definitions are too long.")
+                return
+            response = output[a]
+            a+=1
+        
+        self.post_tweet(response['text'])
+
+    def kittenme(self, tweet):
+		pass
+        
+
  
 
 if __name__ == '__main__':
@@ -170,14 +209,14 @@ if __name__ == '__main__':
 
     # Setup Helpy to listen to twitter stream.
     helpy = HelpyBot(api)
-    helpy.on_status('@Helpy_bot insult @thompson if you would be so kind.')
-    helpy.on_status('@Helpy_bot compliment @ronald if you would be so kind.')
-    helpy.on_status('@Helpy_bot isup google.com')
-    helpy.on_status('@Helpy_bot is up http://www.google.com')
+    #helpy.on_status('@Helpy_bot insult @thompson if you would be so kind.')
+    #helpy.on_status('@Helpy_bot compliment @ronald if you would be so kind.')
+    #helpy.on_status('@Helpy_bot isup google.com')
+    #helpy.on_status('@Helpy_bot isup http://www.google.com')
     #helpy.on_status('@Helpy_bot download http://www.google.com lol.txt')
-    #helpy.on_status('@Helpy_bot reminder in 1:30 to blah blah blah poop')
-    helpy.on_status('@Helpy_bot funnypic, please')
-    helpy.on_status('@Helpy_bot funny pic, please')
+    helpy.on_status('@Helpy_bot lookup beef')
+    helpy.on_status('@Helpy_bot isup http://www.google.com')
+    helpy.on_status('@Helpy_bot music')
     #helpy.on_status('@Helpy_bot reminder in 0:01 to blah blah blah poop')
 
     #listener = HelpyBot()
