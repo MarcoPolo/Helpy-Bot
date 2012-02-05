@@ -7,9 +7,33 @@ import subprocess
 import json
 from tweepy.streaming import StreamListener, Stream
 
+try:
+    from xml.etree import ElementTree # for Python 2.5 users
+except ImportError:
+    from elementtree import ElementTree
+import atom.service
+import atom
+import getopt
+import string
+import time
+import gdata
+import gdata.calendar
+import gdata.service
+import gdata.calendar.service
+
+from secretStuff import *
+
+
+calendar_service = gdata.calendar.service.CalendarService()
+calendar_service.email = email
+calendar_service.password = password
+calendar_service.source = 'Google-Calendar_Python_Sample-1.0'
+calendar_service.ProgrammaticLogin()
+
+
 class HelpyBot(StreamListener):
     def __init__(self, api):
-        self.commands = ['insult', 'compliment', 'isup', 'reminder','download','music', 'funnypic']
+        self.commands = ['insult', 'compliment', 'isup', 'reminder','download','music', 'funnypic','calendar']
         self.api = api
         super(HelpyBot, self).__init__()
 
@@ -171,11 +195,20 @@ class HelpyBot(StreamListener):
         response = '@%s, enjoy: %s' % (user, image_link)
         self.post_tweet(response)
  
+    def calendar(self, tweet):
+        text = tweet['text']
+        data = ' '.join(text)
+        event = gdata.calendar.CalendarEventEntry()
+        event.content = atom.Content(text=data)
+        event.quick_add = gdata.calendar.QuickAdd(value='true')
+
+        new_event = calendar_service.InsertEvent(event, '/calendar/feeds/default/private/full')
+
+
 
 if __name__ == '__main__':
 
     # Setup API credentials.
-    from secretStuff import *
     auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
     auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
     api = tweepy.API(auth)
@@ -190,7 +223,8 @@ if __name__ == '__main__':
     helpy.on_status('@Helpy_bot isup http://www.google.com')
     helpy.on_status('@Helpy_bot music')
     #helpy.on_status('@Helpy_bot reminder in 0:01 to blah blah blah poop')
-    helpy.on_status('@Helpy_bot funnypic, please')
+    #helpy.on_status('@Helpy_bot funnypic, please')
+    #helpy.on_status('@Helpy_bot calendar Dentist 7pm-8pm')
 
     #listener = HelpyBot()
     #stream = Stream(auth, listener)
