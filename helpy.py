@@ -1,7 +1,7 @@
 import sys
 import random
 import urllib
-import reddit
+#import reddit
 import tweepy
 import subprocess
 import json
@@ -51,6 +51,8 @@ class HelpyBot(StreamListener):
 
     # Parses the given status, and routes it to a command.
     def on_status(self, status):
+        print 'the status was',status.text
+        return
         tweet = self.parse_status(status.text, status)
 
         if (not re.match('@helpy_bot', tweet['target'])):
@@ -257,7 +259,7 @@ if __name__ == '__main__':
     helpy = HelpyBot(api)
     stream = Stream(auth, helpy)
     stream.filter(follow=(483102366,),)
-    api.update_status('asda asd asd a')
+    #api.update_status('asda asd asd a')
 
     #helpy.on_status('@Helpy_bot insult @thompson if you would be so kind.')
     #helpy.on_status('@Helpy_bot compliment @ronald if you would be so kind.')
