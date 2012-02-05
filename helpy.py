@@ -5,6 +5,7 @@ import reddit
 import tweepy
 import subprocess
 import json
+import re
 from tweepy.streaming import StreamListener, Stream
 from wordnik import Wordnik
 import json
@@ -78,9 +79,6 @@ class HelpyBot(StreamListener):
             response = '%s %s' % (target, compliments[random.randint(0,45)])
         self.post_tweet(response)
 
-    def define(self, tweet):
-        pass
-    
     def download(self, tweet):
         text = tweet['text']
         url = text[0]
@@ -198,8 +196,6 @@ class HelpyBot(StreamListener):
         rand_w = random.randint(300,700)
         url = "http://placekitten.com/g/"+str(rand_w)+"/"+str(rand_h)
         self.post_tweet(url)
-
- 
 
 if __name__ == '__main__':
 
