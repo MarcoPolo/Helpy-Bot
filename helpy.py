@@ -27,7 +27,7 @@ class HelpyBot(StreamListener):
 
     # Parses the given status, and routes it to a command.
     def on_status(self, status):
-        tweet = self.parse_status(status, {})#status.text)
+        tweet = self.parse_status(status.text, status)
 
         if (not re.match('@helpy_bot', tweet['target'])):
             print '[Helpy] Tweet not meant for Helpy Bot.'
@@ -49,12 +49,12 @@ class HelpyBot(StreamListener):
         parsed['command'] = tokens[1].strip('.,!?')
         parsed['text'] = tokens[2:]
         parsed['raw_text'] = ' '.join(tokens[2:])
-        #parsed['sender'] = status.user.screen_name
+        parsed['sender'] = status.user.screen_name
         return parsed
 
     # Post text as a tweet to Helpy's account. 
     def post_tweet(self, text):
-        print text #todo: make it post tweets to helpy_bot's account
+        self.api.update_status('howdysasd asjdkajsdkj alksjd')
 
     # Command Implementations
     # -----------------------
@@ -107,8 +107,7 @@ class HelpyBot(StreamListener):
         url = text[0]
         if (url.find('http://') == -1 and url.find('https://') == -1 ):
             url = 'http://'+url
-        user = 'dr_choc'
-        #user = tweet['sender']
+        user = tweet['sender']
         up = False
 
         try:
@@ -131,8 +130,7 @@ class HelpyBot(StreamListener):
 
     def reminder(self, tweet):
         text = tweet['text']
-        user = 'dr_choc'
-        #user = tweet['sender']
+        user = tweet['sender']
         time = text[1].split(':')
         reminder = text[3:]
         reminder = ' '.join(reminder)
@@ -155,8 +153,7 @@ class HelpyBot(StreamListener):
 
     def funnypic(self, tweet):
         text = tweet['text']
-        user = 'dr_choc'
-        #user = tweet['sender']
+        user = tweet['sender']
 
         r = reddit.Reddit(user_agent='helpy_bot')
         submissions = r.get_subreddit('funny').get_hot(limit=25)
@@ -200,8 +197,7 @@ class HelpyBot(StreamListener):
     def flipcoin(self, tweet):
         thecoin = ["Heads", "Tails"]
         self.post_tweet(thecoin[random.randint(0,1)])
-
-    
+ 
 
 if __name__ == '__main__':
 
@@ -213,19 +209,20 @@ if __name__ == '__main__':
 
     # Setup Helpy to listen to twitter stream.
     helpy = HelpyBot(api)
+    stream = Stream(auth, helpy)
+    stream.filter(follow=(483102366,),)
+    api.update_status('asda asd asd a')
+
     #helpy.on_status('@Helpy_bot insult @thompson if you would be so kind.')
     #helpy.on_status('@Helpy_bot compliment @ronald if you would be so kind.')
     #helpy.on_status('@Helpy_bot isup google.com')
     #helpy.on_status('@Helpy_bot isup http://www.google.com')
     #helpy.on_status('@Helpy_bot download http://www.google.com lol.txt')
-    helpy.on_status('@Helpy_bot define beef')
-    helpy.on_status('@Helpy_bot isup http://www.google.com')
-    helpy.on_status('@Helpy_bot music')
-    helpy.on_status('@Helpy_bot kittenme')
-    helpy.on_status('@Helpy_bot flipcoin')
+    #helpy.on_status('@Helpy_bot define beef')
+    #helpy.on_status('@Helpy_bot isup http://www.google.com')
+    #helpy.on_status('@Helpy_bot music')
+    #helpy.on_status('@Helpy_bot kittenme')
+    #helpy.on_status('@Helpy_bot flipcoin')
     #helpy.on_status('@Helpy_bot reminder in 0:01 to blah blah blah poop')
 
-    #listener = HelpyBot()
-    #stream = Stream(auth, listener)
-    #stream.filter(follow=(483102366,),)
 
