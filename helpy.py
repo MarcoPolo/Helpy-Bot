@@ -80,7 +80,9 @@ class HelpyBot(StreamListener):
 
     # Post text as a tweet to Helpy's account. 
     def post_tweet(self, text):
-        self.api.update_status('howdysasd asjdkajsdkj alksjd')
+        text = text.replace("'","")
+        text = text.replace(";","")
+        procs = subprocess.Popen("python post.py '"+ test +"'", shell=True)
 
     # Command Implementations
     # -----------------------
