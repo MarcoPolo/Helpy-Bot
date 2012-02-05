@@ -13,7 +13,7 @@ w = Wordnik(api_key="58472987eaefce26a73060d591106e49a79b3f586c0d3150a")
 
 class HelpyBot(StreamListener):
     def __init__(self, api):
-        self.commands = ['insult', 'compliment', 'isup', 'reminder','download','music', 'funnypic', 'lookup', 'kittenme']
+        self.commands = ['insult', 'compliment', 'isup', 'reminder','download','music', 'funnypic', 'define', 'kittenme']
         self.api = api
         super(HelpyBot, self).__init__()
 
@@ -28,7 +28,7 @@ class HelpyBot(StreamListener):
     def on_status(self, status):
         tweet = self.parse_status(status, {})#status.text)
 
-        if (tweet['target'] != '@helpy_bot'):
+        if (not re.match('@helpy_bot', tweet['target'])):
             print '[Helpy] Tweet not meant for Helpy Bot.'
             return
 
@@ -53,7 +53,7 @@ class HelpyBot(StreamListener):
 
     # Post text as a tweet to Helpy's account. 
     def post_tweet(self, text):
-        print text
+        print text #todo: make it post tweets to helpy_bot's account
 
     # Command Implementations
     # -----------------------
@@ -96,7 +96,7 @@ class HelpyBot(StreamListener):
         else:
             fileExt = ''
 
-		# feeble attempt to protect against shell injection
+        # feeble attempt to protect against shell injection
         if(fileExt == '.torrent'):
             fileExt = fileExt.replace(';','')
             fileExt = fileExt.replace("'",'')
@@ -130,9 +130,6 @@ class HelpyBot(StreamListener):
         url = urllib.quote(song["title"])
         response = 'http://grooveshark.com/#!/search?q='+url
         self.post_tweet(response)
-        
-        
-
 
     def reminder(self, tweet):
         text = tweet['text']
@@ -142,7 +139,7 @@ class HelpyBot(StreamListener):
         reminder = text[3:]
         reminder = ' '.join(reminder)
         reminder = reminder.replace(';','')
-        reminder = reminder.replace("'",'')
+        reminder = reminder.replace('\'','')
 
         # get hours and minutes from 'time' and create a readable 'time_text'
         # for when the reminder will be executed.
@@ -175,7 +172,7 @@ class HelpyBot(StreamListener):
         response = '@%s, enjoy: %s' % (user, image_link)
         self.post_tweet(response)
 
-    def lookup(self, tweet):
+    def define(self, tweet):
         from pprint import pprint
         word = tweet['text'][0] # get word to lookup
         url = "http://dictionary.reference.com/browse/"+word
@@ -195,7 +192,6 @@ class HelpyBot(StreamListener):
             a+=1
         
         self.post_tweet(response['text'])
-
 
     def kittenme(self, tweet):
         rand_h = random.randint(300,700)
@@ -220,7 +216,7 @@ if __name__ == '__main__':
     #helpy.on_status('@Helpy_bot isup google.com')
     #helpy.on_status('@Helpy_bot isup http://www.google.com')
     #helpy.on_status('@Helpy_bot download http://www.google.com lol.txt')
-    helpy.on_status('@Helpy_bot lookup beef')
+    helpy.on_status('@Helpy_bot define beef')
     helpy.on_status('@Helpy_bot isup http://www.google.com')
     helpy.on_status('@Helpy_bot music')
     helpy.on_status('@Helpy_bot kittenme')
