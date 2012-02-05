@@ -14,7 +14,7 @@ w = Wordnik(api_key="58472987eaefce26a73060d591106e49a79b3f586c0d3150a")
 
 class HelpyBot(StreamListener):
     def __init__(self, api):
-        self.commands = ['insult', 'compliment', 'isup', 'reminder','download','music', 'funnypic', 'define', 'kittenme', 'coin']
+        self.commands = ['insult', 'compliment', 'isup', 'reminder','download','music', 'funnypic', 'define', 'kittenme', 'flipcoin']
         self.api = api
         super(HelpyBot, self).__init__()
 
@@ -197,7 +197,7 @@ class HelpyBot(StreamListener):
         url = "http://placekitten.com/g/"+str(rand_w)+"/"+str(rand_h)
         self.post_tweet(url)
 
-    def coin(self, tweet):
+    def flipcoin(self, tweet):
         thecoin = ["Heads", "Tails"]
         self.post_tweet(thecoin[random.randint(0,1)])
 
@@ -222,7 +222,7 @@ if __name__ == '__main__':
     helpy.on_status('@Helpy_bot isup http://www.google.com')
     helpy.on_status('@Helpy_bot music')
     helpy.on_status('@Helpy_bot kittenme')
-    helpy.on_status('@Helpy_bot coin')
+    helpy.on_status('@Helpy_bot flipcoin')
     #helpy.on_status('@Helpy_bot reminder in 0:01 to blah blah blah poop')
 
     #listener = HelpyBot()
