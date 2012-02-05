@@ -14,7 +14,7 @@ w = Wordnik(api_key="58472987eaefce26a73060d591106e49a79b3f586c0d3150a")
 
 class HelpyBot(StreamListener):
     def __init__(self, api):
-        self.commands = ['insult', 'compliment', 'isup', 'reminder','download','music', 'funnypic', 'define', 'kittenme', 'coin']
+        self.commands = ['insult', 'compliment', 'isup', 'reminder','download','music', 'funnypic', 'define', 'kittenme', 'coin', 'likeaboss']
         self.api = api
         super(HelpyBot, self).__init__()
 
@@ -201,6 +201,18 @@ class HelpyBot(StreamListener):
         thecoin = ["Heads", "Tails"]
         self.post_tweet(thecoin[random.randint(0,1)])
 
+    def likeaboss(self, tweet):
+        images = [
+            "http://s3.amazonaws.com/kym-assets/photos/images/original/000/114/151/14185212UtNF3Va6.gif?1302832919",
+            "http://s3.amazonaws.com/kym-assets/photos/images/newsfeed/000/110/885/boss.jpg",
+            "http://verydemotivational.files.wordpress.com/2011/06/demotivational-posters-like-a-boss.jpg",
+            "http://assets.head-fi.org/b/b3/b3ba6b88_funny-facebook-fails-like-a-boss3.jpg",
+            "http://img.anongallery.org/img/6/0/like-a-boss.jpg",
+            "http://www.youtube.com/watch?v=NisCkxU544c",
+            "http://pigroll.com/img/like_a_boss.jpg",
+            "http://3.bp.blogspot.com/-bY9Ca6gmUz4/TrQC_cdBwQI/AAAAAAAACR4/vwDskIZk1k0/s1600/baby+boss.jpg"
+        ]
+        self.post_tweet(images[random.randint(0, len(images)-1)])
     
 
 if __name__ == '__main__':
@@ -218,12 +230,13 @@ if __name__ == '__main__':
     #helpy.on_status('@Helpy_bot isup google.com')
     #helpy.on_status('@Helpy_bot isup http://www.google.com')
     #helpy.on_status('@Helpy_bot download http://www.google.com lol.txt')
-    helpy.on_status('@Helpy_bot define beef')
-    helpy.on_status('@Helpy_bot isup http://www.google.com')
-    helpy.on_status('@Helpy_bot music')
-    helpy.on_status('@Helpy_bot kittenme')
-    helpy.on_status('@Helpy_bot coin')
+    #helpy.on_status('@Helpy_bot define beef')
+    #helpy.on_status('@Helpy_bot isup http://www.google.com')
+    #helpy.on_status('@Helpy_bot music')
+    #helpy.on_status('@Helpy_bot kittenme')
+    #helpy.on_status('@Helpy_bot coin')
     #helpy.on_status('@Helpy_bot reminder in 0:01 to blah blah blah poop')
+    helpy.on_status('@Helpy_bot likeaboss')
 
     #listener = HelpyBot()
     #stream = Stream(auth, listener)
